@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Tharusha Kavishan">
+    <title>Fiverr Caluculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container mb-5">
+        <h1 class="text-center">Fiverr Caluculator</h1>
+        <div class="mb-3">
+            <label for="active-orders" class="form-label">Active orders Total</label>
+            <input type="number" class="form-control" id="active-orders" step="any">
+        </div>
+        <div class="mb-3">
+            <label for="inactive-orders" class="form-label">Incomplete orders Total</label>
+            <input type="number" class="form-control" id="inactive-orders" step="any">
+        </div>
+        <div class="mb-3">
+            <label for="pending-clearance" class="form-label">Pending Clearance Total</label>
+            <input type="number" class="form-control" id="pending-clearance" step="any">
+        </div>
+        <div class="mb-3">
+            <label for="promotion-gig-this-month-due" class="form-label">Promotion Gig/seller plus Due</label>
+            <input type="number" class="form-control" id="promotion-gig-this-month-due" step="any" value="0">
+        </div>
+        <div class="mb-3">
+            <label for="is-cash-advance-got" class="form-label">Is Cash Advance Got?</label><br>
+            <select class="form-select" aria-label="Default select example" id="is-cash-advance-got">
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="payoneer-rates" class="form-label">Payoneer Rates to LKR</label>
+            <input type="number" class="form-control" id="payoneer-rates" step="any" required>
+        </div>
+        <button type="submit" class="btn btn-primary" id="submit-btn" onclick="calculate_fiverr_revenue();">Submit</button>
+        <h4 class="text-center">Final Fiverr Revenue: LKR <span id="final-fiverr-revenue"></span></h4>
+    </div>
+    <div class="container mt-5">
+        <h1 class="text-center">Fiverr Single Order Caluculator</h1>
+        <div class="mb-3">
+            <label for="order-amount" class="form-label">Order Amount</label>
+            <input type="number" class="form-control" id="order-amount" step="any">
+        </div>
+        <div class="mb-3">
+            <label for="is-cash-advance-got-2" class="form-label">Is Cash Advance Got?</label><br>
+            <select class="form-select" aria-label="Default select example" id="is-cash-advance-got-2">
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="payoneer-rates-2" class="form-label">Payoneer Rates to LKR</label>
+            <input type="number" class="form-control" id="payoneer-rates-2" step="any" required>
+        </div>
+        <button type="submit" class="btn btn-primary" id="submit-btn-2" onclick="calculate_single_order();">Submit</button>
+        <h4 class="text-center">Final Single Order Revenue: LKR <span id="final-single-order-revenue"></span></h4>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+     integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+     <script>
+        function calculate_fiverr_revenue() {
+            var active_orders = document.getElementById("active-orders").value;
+            var inactive_orders = document.getElementById("inactive-orders").value;
+            var pending_clearance = document.getElementById("pending-clearance").value;
+            var is_cash_advance_got = document.getElementById("is-cash-advance-got").value;
+            var payoneer_rates = document.getElementById("payoneer-rates").value;
+            var promotion_gig_this_month_due = document.getElementById("promotion-gig-this-month-due").value;
+           
+            localStorage.setItem("active_orders", active_orders);
+            localStorage.setItem("inactive_orders", inactive_orders);
+            localStorage.setItem("pending_clearance", pending_clearance);
+            localStorage.setItem("is_cash_advance_got", is_cash_advance_got);
+            localStorage.setItem("payoneer_rates", payoneer_rates);
+            localStorage.setItem("promotion_gig_this_month_due", promotion_gig_this_month_due);
+
+            var orders_final_total = parseFloat(active_orders) - parseFloat(inactive_orders);
+            var active_orders_fiverr_fee = orders_final_total * 0.2;
+            var total_pending_clearance = parseFloat(pending_clearance) + (parseFloat(orders_final_total) - parseFloat(active_orders_fiverr_fee));
+           
+            var final_fiverr_revenue = total_pending_clearance;
+            if (is_cash_advance_got == 1) {
+                final_fiverr_revenue = parseFloat(total_pending_clearance) - (parseFloat(total_pending_clearance) * 0.4);
+            }
+           
+            if(promotion_gig_this_month_due > 0) {
+                final_fiverr_revenue = parseFloat(final_fiverr_revenue) - parseFloat(promotion_gig_this_month_due);
+            }
+            console.log(final_fiverr_revenue);
+            var final_fiverr_revenue_payooner = (parseFloat(final_fiverr_revenue) - 3) * parseFloat(payoneer_rates);
+            document.getElementById("final-fiverr-revenue").innerHTML = final_fiverr_revenue_payooner.toFixed(2);
+        }
+        window.onload = function() {
+            document.getElementById("active-orders").value = localStorage.getItem("active_orders");
+            document.getElementById("inactive-orders").value = localStorage.getItem("inactive_orders");
+            document.getElementById("pending-clearance").value = localStorage.getItem("pending_clearance");
+            document.getElementById("payoneer-rates").value = localStorage.getItem("payoneer_rates");
+            document.getElementById("payoneer-rates-2").value = localStorage.getItem("payoneer_rates_2");
+            document.getElementById("promotion-gig-this-month-due").value = localStorage.getItem("promotion_gig_this_month_due");
+            var is_cash_advance_got = localStorage.getItem("is_cash_advance_got");
+            var select = document.getElementById("is-cash-advance-got");
+            for (var i = 0; i < select.options.length; i++) {
+                if (select.options[i].value == is_cash_advance_got) {
+                    select.options[i].selected = true;
+                    break;
+                }
+            }
+        }
+     </script>
+     <script>
+        function calculate_single_order(){
+            var order_amount = document.getElementById("order-amount").value;
+            var is_cash_advance_got = document.getElementById("is-cash-advance-got-2").value;
+            var payoneer_rates = document.getElementById("payoneer-rates-2").value;
+            localStorage.setItem("payoneer_rates_2", payoneer_rates);
+            var final_single_order_revenue = parseFloat(order_amount) - (parseFloat(order_amount) * 0.2);
+            if (is_cash_advance_got == 1) {
+                final_single_order_revenue = parseFloat(final_single_order_revenue) - (parseFloat(final_single_order_revenue) * 0.4);
+            }
+            console.log(final_single_order_revenue);
+            final_single_order_revenue = parseFloat(final_single_order_revenue) * parseFloat(payoneer_rates);
+            document.getElementById("final-single-order-revenue").innerHTML = final_single_order_revenue.toFixed(2);
+        }
+     </script>
+</body>
+</html>
